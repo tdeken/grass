@@ -12,6 +12,7 @@ type CreateProject struct {
 	err  error
 }
 
+// NewCreateProject create_project
 func NewCreateProject(name string) *CreateProject {
 	return &CreateProject{
 		Name: name,
@@ -19,6 +20,7 @@ func NewCreateProject(name string) *CreateProject {
 	}
 }
 
+// Run do logic
 func (s *CreateProject) Run() {
 	var err error
 	defer func() {

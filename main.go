@@ -8,7 +8,8 @@ import (
 )
 
 const (
-	sceneCreateProject = iota + 1
+	sceneCreateNone = iota
+	sceneCreateProject
 )
 
 type Args struct {
@@ -16,6 +17,7 @@ type Args struct {
 	CreateProject string // project_name to be created
 }
 
+var help bool
 var params = &Args{}
 
 var fs = flag.NewFlagSet("grass", flag.ExitOnError)
@@ -23,13 +25,13 @@ var fs = flag.NewFlagSet("grass", flag.ExitOnError)
 func init() {
 	defer parse()
 
+	// help
+	flag.BoolVar(&help, "h", false, "grass options help")
+	flag.BoolVar(&help, "help", false, "grass options help")
+
 	// create_project
 	fs.StringVar(&params.CreateProject, "cp", "", "project name to be created")
 	fs.StringVar(&params.CreateProject, "create_project", "", "project name to be created")
-}
-
-func help() {
-
 }
 
 // 解析命令行参数
@@ -41,6 +43,12 @@ func parse() {
 
 	if params.CreateProject != "" {
 		params.scene = sceneCreateProject
+	}
+
+	if help || params.scene == sceneCreateNone {
+		_, _ = fmt.Fprintln(os.Stderr, "grass usage options:")
+		fs.PrintDefaults()
+		os.Exit(0)
 	}
 }
 
