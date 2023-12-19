@@ -5,18 +5,21 @@ import (
 	"fmt"
 	"github.com/tdeken/grass/utils"
 	"os/exec"
+	"strings"
 )
 
 type CreateProject struct {
-	Name string
-	err  error
+	dir     string
+	modName string
+	err     error
 }
 
 // NewCreateProject create_project
 func NewCreateProject(name string) *CreateProject {
 	return &CreateProject{
-		Name: name,
-		err:  nil,
+		dir:     name[strings.LastIndex(name, "/")+1:],
+		modName: name,
+		err:     nil,
 	}
 }
 
@@ -26,13 +29,13 @@ func (s *CreateProject) Run() {
 	defer func() {
 		s.err = err
 	}()
-	err = utils.NotExistCreateDir(s.Name)
+	err = utils.NotExistCreateDir(s.dir)
 	if err != nil {
 		return
 	}
 
-	cmd := exec.Command("go", "mod", "init", s.Name)
-	cmd.Dir = s.Name
+	cmd := exec.Command("go", "mod", "init", s.modName)
+	cmd.Dir = s.dir
 
 	err = cmd.Run()
 	if err != nil {

@@ -31,15 +31,17 @@ func init() {
 
 	// create_project
 	fs.StringVar(&params.CreateProject, "cp", "", "project name to be created")
-	fs.StringVar(&params.CreateProject, "create_project", "", "project name to be created")
 }
 
 // 解析命令行参数
 func parse() {
-	if err := fs.Parse(os.Args[1:]); err != nil {
+	var args = os.Args[1:]
+	if err := fs.Parse(args); err != nil {
 		_, _ = fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
 	}
+
+	fmt.Println(args)
 
 	if params.CreateProject != "" {
 		params.scene = sceneCreateProject
@@ -59,7 +61,7 @@ func main() {
 
 		cp.Run()
 		if cp.Error() != nil {
-			fmt.Println(cp.Error())
+			fmt.Printf("%v \r\n", cp.Error())
 			os.Exit(1)
 		}
 	}
