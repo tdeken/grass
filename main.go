@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"grass/createproject"
+	"github.com/tdeken/grass/createproject"
 	"os"
 )
 
@@ -53,7 +53,6 @@ func parse() {
 }
 
 func main() {
-
 	switch params.scene {
 	case sceneCreateProject:
 		cp := createproject.NewCreateProject(params.CreateProject)
