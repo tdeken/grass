@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// 判断文件文件夹是否存在
+// IsFileExist 判断文件文件夹是否存在
 func IsFileExist(path string) (bool, error) {
 	fileInfo, err := os.Stat(path)
 
@@ -27,7 +27,7 @@ func IsFileExist(path string) (bool, error) {
 	return false, err
 }
 
-// 连续创建目录
+// MkDirAll 连续创建目录
 func MkDirAll(paths ...string) error {
 	for _, path := range paths {
 		if path == "" {
@@ -41,7 +41,7 @@ func MkDirAll(paths ...string) error {
 	return nil
 }
 
-// 不存在目录就创建目录
+// NotExistCreateDir 不存在目录就创建目录
 func NotExistCreateDir(path string) error {
 	exist, err := IsFileExist(path)
 	if err != nil {
@@ -55,7 +55,7 @@ func NotExistCreateDir(path string) error {
 	return os.Mkdir(path, 0777)
 }
 
-// 不存在就创建文件
+// NotExistCreateFile 不存在就创建文件
 func NotExistCreateFile(filename, content string) error {
 	exist, err := IsFileExist(filename)
 	if err != nil {
@@ -69,7 +69,7 @@ func NotExistCreateFile(filename, content string) error {
 	return CreateFile(filename, content)
 }
 
-// 蛇形转驼峰
+// CamelString 蛇形转驼峰
 func CamelString(s string) string {
 	data := make([]byte, 0, len(s))
 	j := false
@@ -94,7 +94,7 @@ func CamelString(s string) string {
 	return string(data[:])
 }
 
-// 结构体解析
+// GetClass 结构体解析
 func GetClass(name, class string, dictionary map[string]string) string {
 	if strings.Contains(class, "?") {
 		spt := strings.Split(class, "?")
@@ -120,7 +120,7 @@ func GetClass(name, class string, dictionary map[string]string) string {
 	return class
 }
 
-// 大小写之间用特定字符分割
+// MidString 大小写之间用特定字符分割
 func MidString(s string, sep byte) string {
 	data := make([]byte, 0, len(s)*2)
 	j := false
@@ -142,7 +142,7 @@ func MidString(s string, sep byte) string {
 	return strings.ToLower(string(data[:]))
 }
 
-// 蛇形转请求头参数
+// SnHeader 蛇形转请求头参数
 func SnHeader(s string) string {
 	arr := strings.Split(s, "_")
 
@@ -157,7 +157,7 @@ func SnHeader(s string) string {
 	return str
 }
 
-// 创建模版数据
+// CreateTmp 创建模版数据
 func CreateTmp(content any, parse string) (text string, err error) {
 	t, err := template.New("tmp.tpl").Parse(parse)
 	if err != nil {
@@ -173,7 +173,7 @@ func CreateTmp(content any, parse string) (text string, err error) {
 	return buf.String(), nil
 }
 
-// 创建文件
+// CreateFile 创建文件
 func CreateFile(filename, content string) (err error) {
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0777)
 	defer file.Close()
@@ -186,7 +186,7 @@ func CreateFile(filename, content string) (err error) {
 	return
 }
 
-// 追加内容到文件
+// AppendFile 追加内容到文件
 func AppendFile(filename, content string) (err error) {
 	file, err := os.OpenFile(filename, os.O_APPEND|os.O_RDWR, 0777)
 	defer file.Close()
