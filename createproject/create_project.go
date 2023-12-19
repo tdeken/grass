@@ -3,7 +3,7 @@ package createproject
 import (
 	"errors"
 	"fmt"
-	"grass/utils"
+	"github.com/tdeken/grass/utils"
 	"os/exec"
 )
 
