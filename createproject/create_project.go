@@ -3,55 +3,47 @@ package createproject
 import (
 	"errors"
 	"fmt"
+	"github.com/tdeken/grass/basic"
 	"github.com/tdeken/grass/utils"
 	"os/exec"
-	"strings"
 )
 
 type CreateProject struct {
-	dir     string
-	modName string
-	err     error
+	basic.Basic
 }
 
 // NewCreateProject create_project
-func NewCreateProject(name string) *CreateProject {
-	return &CreateProject{
-		dir:     name[strings.LastIndex(name, "/")+1:],
-		modName: name,
-		err:     nil,
+func NewCreateProject(modName string) *CreateProject {
+	cp := new(CreateProject)
+	{
+		cp.Init(modName)
 	}
+
+	return cp
 }
 
 // Run do logic
 func (s *CreateProject) Run() {
 	var err error
 	defer func() {
-		s.err = err
+		s.Err = err
 	}()
-	err = utils.NotExistCreateDir(s.dir)
+	err = utils.NotExistCreateDir(s.Dir)
 	if err != nil {
 		return
 	}
 
-	cmd := exec.Command("go", "mod", "init", s.modName)
-	cmd.Dir = s.dir
+	cmd := exec.Command("go", "mod", "init", s.ModName)
+	cmd.Dir = s.Dir
 
-	err = cmd.Run()
-	if err != nil {
-		return
-	}
+	_ = cmd.Run()
 
 	return
 }
 
 func (s *CreateProject) Error() error {
-	if s.err == nil {
+	if s.Err == nil {
 		return nil
 	}
-	return s.errPrefix(s.err)
-}
-
-func (s *CreateProject) errPrefix(err error) error {
-	return errors.New(fmt.Sprintf("CreateProject err: %v", err))
+	return errors.New(fmt.Sprintf("CreateProject err: %v", s.Err))
 }

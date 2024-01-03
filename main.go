@@ -7,14 +7,21 @@ import (
 	"os"
 )
 
+type Build interface {
+	Run()
+	Error() error
+}
+
 const (
 	sceneCreateNone = iota
 	sceneCreateProject
+	sceneFiberWeb
 )
 
 type Args struct {
 	scene         int    // what you  will do scene
 	CreateProject string // project_name to be created
+	FiberWeb      string // fiber web frame
 }
 
 var help bool
@@ -31,6 +38,9 @@ func init() {
 
 	// create_project
 	fs.StringVar(&params.CreateProject, "cp", "", "project name to be created")
+
+	// create fiber web frame
+	fs.StringVar(&params.CreateProject, "fb", "", "project name to be created")
 }
 
 // 解析命令行参数
@@ -41,10 +51,10 @@ func parse() {
 		os.Exit(1)
 	}
 
-	fmt.Println(args)
-
 	if params.CreateProject != "" {
 		params.scene = sceneCreateProject
+	} else if params.FiberWeb != "" {
+		params.scene = sceneFiberWeb
 	}
 
 	if help || params.scene == sceneCreateNone {
@@ -55,14 +65,17 @@ func parse() {
 }
 
 func main() {
+	var build Build
 	switch params.scene {
 	case sceneCreateProject:
-		cp := createproject.NewCreateProject(params.CreateProject)
+		build = createproject.NewCreateProject(params.CreateProject)
+		build.Run()
+	case sceneFiberWeb:
 
-		cp.Run()
-		if cp.Error() != nil {
-			fmt.Printf("%v \r\n", cp.Error())
-			os.Exit(1)
-		}
+	}
+
+	if build != nil && build.Error() != nil {
+		fmt.Printf("%v \r\n", build.Error())
+		os.Exit(1)
 	}
 }
