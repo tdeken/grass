@@ -274,7 +274,7 @@ func (s *FiberWeb) config() (err error) {
 		return
 	}
 
-	content, err := utils.CreateTmp(nil, confingTemp)
+	content, err := utils.CreateTmp(nil, configTemp)
 	if err != nil {
 		return
 	}
@@ -283,6 +283,20 @@ func (s *FiberWeb) config() (err error) {
 	err = utils.NotExistCreateFile(filename, content)
 	if err != nil {
 		return
+	}
+
+	var env = []string{"local", "dev", "test", "prod"}
+	for _, v := range env {
+		content, err = utils.CreateTmp(nil, configFileTemp)
+		if err != nil {
+			return
+		}
+
+		filename = fmt.Sprintf("%s/etc/config-%s.yaml", s.Dir, v)
+		err = utils.NotExistCreateFile(filename, content)
+		if err != nil {
+			return
+		}
 	}
 
 	return
@@ -323,6 +337,17 @@ func (s *FiberWeb) main() (err error) {
 	}
 
 	filename := s.Dir + "/main.go"
+	err = utils.NotExistCreateFile(filename, content)
+	if err != nil {
+		return
+	}
+
+	content, err = utils.CreateTmp(DockerfileTemp{ModName: s.ModName}, dockerfileTemp)
+	if err != nil {
+		return
+	}
+
+	filename = s.Dir + "/Dockerfile"
 	err = utils.NotExistCreateFile(filename, content)
 	if err != nil {
 		return

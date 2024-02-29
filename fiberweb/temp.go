@@ -205,7 +205,7 @@ func NewFormError(code int32, detail, form string) *Error {
 }
 `
 
-const confingTemp = `package config
+const configTemp = `package config
 
 import (
 	"fmt"
@@ -249,6 +249,12 @@ type Server struct {
 	Env         string ` + "`mapstructure:" + `"env"` + "`" + `          // 动环境，取值为 "dev"、"test" 或 "prod"，默认为 "dev"
 	Port        int    ` + "`mapstructure:" + `"port"` + "`" + `         // 服务端口
 }
+`
+
+const configFileTemp = `# 服务器配置
+server:
+  env: dev #local dev test prod
+  port: "13100"
 `
 
 type BootTemp struct {
@@ -330,4 +336,42 @@ func main() {
 	//关闭程序
 	boot.Shutdown()
 }
+`
+
+type DockerfileTemp struct {
+	ModName string
+}
+
+const dockerfileTemp = `FROM golang:1.20-alpine as build
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
+RUN apk --no-cache add tzdata \
+	&& apk --no-cache add ca-certificates \
+    && update-ca-certificates
+
+#设置 GO 环境变量
+ENV CGO_ENABLED=0
+ENV GO111MODULE=on
+ENV GOPROXY=https://mirrors.aliyun.com/goproxy/
+ENV GOPRIVATE=gits.branchcn.com/backend
+
+WORKDIR /{{ .ModName }}
+
+COPY . .
+
+RUN go build -o {{ .ModName }} ./main.go
+
+FROM scratch as final
+
+# 设置时区为上海
+COPY --from=build /usr/share/zoneinfo/Asia/Shanghai /usr/share/zoneinfo/Asia/Shanghai
+ENV TZ=Asia/Shanghai
+
+COPY --from=build /{{ .ModName }}/{{ .ModName }} /
+COPY --from=build /{{ .ModName }}/etc/ /etc/
+COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+
+ENTRYPOINT [ "/{{ .ModName }}", "-env" ]
+CMD ["prod"]
 `
