@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/tdeken/grass/basic"
 	"github.com/tdeken/grass/utils"
-	"os/exec"
 )
 
 type CreateProject struct {
@@ -33,10 +32,38 @@ func (s *CreateProject) Run() {
 		return
 	}
 
-	cmd := exec.Command("go", "mod", "init", s.ModName)
-	cmd.Dir = s.Dir
+	err = utils.RunCommand(s.Dir, "go", "mod", "init", s.ModName)
+	if err != nil {
+		return
+	}
 
-	_ = cmd.Run()
+	err = s.etc()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+// etc dir init
+// stores configuration files
+func (s *CreateProject) etc() (err error) {
+	dir := s.Dir + "/etc"
+
+	err = utils.NotExistCreateDir(dir)
+	if err != nil {
+		return
+	}
+
+	content, err := utils.CreateTmp(ProtoYamlFile{
+		ModName: s.ModName,
+	}, protoYamlFile)
+	if err != nil {
+		return
+	}
+
+	filename := dir + "/grass.yaml"
+	err = utils.NotExistCreateFile(filename, content)
 
 	return
 }
@@ -45,5 +72,6 @@ func (s *CreateProject) Error() error {
 	if s.Err == nil {
 		return nil
 	}
+
 	return errors.New(fmt.Sprintf("CreateProject err: %v", s.Err))
 }

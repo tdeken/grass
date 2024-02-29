@@ -2,8 +2,10 @@ package utils
 
 import (
 	"bytes"
+	"errors"
 	"html/template"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -195,6 +197,22 @@ func AppendFile(filename, content string) (err error) {
 	}
 
 	_, err = file.WriteString(content)
+
+	return
+}
+
+// RunCommand 运行命令
+func RunCommand(dir, name string, args ...string) (err error) {
+	var out bytes.Buffer
+	cmd := exec.Command(name, args...)
+	cmd.Dir = dir
+	cmd.Stderr = &out
+
+	err = cmd.Run()
+	if err != nil {
+		err = errors.New(out.String())
+		return
+	}
 
 	return
 }

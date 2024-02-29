@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/tdeken/grass/createproject"
+	"github.com/tdeken/grass/fiberweb"
 	"os"
 )
 
@@ -14,14 +14,12 @@ type Build interface {
 
 const (
 	sceneCreateNone = iota
-	sceneCreateProject
 	sceneFiberWeb
 )
 
 type Args struct {
-	scene         int    // what you  will do scene
-	CreateProject string // project_name to be created
-	FiberWeb      string // fiber web frame
+	scene    int    // what you  will do scene
+	FiberWeb string // fiber web frame
 }
 
 var help bool
@@ -36,11 +34,8 @@ func init() {
 	flag.BoolVar(&help, "h", false, "grass options help")
 	flag.BoolVar(&help, "help", false, "grass options help")
 
-	// create_project
-	fs.StringVar(&params.CreateProject, "cp", "", "project name to be created")
-
 	// create fiber web frame
-	fs.StringVar(&params.CreateProject, "fb", "", "project name to be created")
+	fs.StringVar(&params.FiberWeb, "fb", "", "create fiber web frame")
 }
 
 // 解析命令行参数
@@ -51,9 +46,7 @@ func parse() {
 		os.Exit(1)
 	}
 
-	if params.CreateProject != "" {
-		params.scene = sceneCreateProject
-	} else if params.FiberWeb != "" {
+	if params.FiberWeb != "" {
 		params.scene = sceneFiberWeb
 	}
 
@@ -67,15 +60,17 @@ func parse() {
 func main() {
 	var build Build
 	switch params.scene {
-	case sceneCreateProject:
-		build = createproject.NewCreateProject(params.CreateProject)
-		build.Run()
 	case sceneFiberWeb:
-
+		build = fiberweb.NewFiberWeb(params.FiberWeb)
 	}
 
-	if build != nil && build.Error() != nil {
-		fmt.Printf("%v \r\n", build.Error())
-		os.Exit(1)
+	if build == nil {
+		return
+	}
+
+	build.Run()
+	if build.Error() != nil {
+		fmt.Printf("%v \r", build.Error())
+		return
 	}
 }
