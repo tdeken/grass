@@ -76,26 +76,9 @@ func (s *FiberWeb) Run() {
 	cmd.Dir = s.Dir
 	cmd.Stderr = &out
 
-	stdout, err := cmd.StdoutPipe()
+	err = cmd.Run()
 	if err != nil {
-		return
-	}
-
-	if err = cmd.Start(); err != nil {
-		return
-	}
-
-	for {
-		d := make([]byte, 1024)
-		_, err1 := stdout.Read(d)
-		if err1 != nil {
-			break
-		}
-
-		fmt.Printf("%s", string(d))
-	}
-
-	if err = cmd.Wait(); err != nil {
+		err = errors.New(out.String())
 		return
 	}
 

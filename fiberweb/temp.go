@@ -37,12 +37,12 @@ type RequestInterface any
 
 func CheckParams(ctx *fiber.Ctx, rt RequestInterface) (err error) {
 	switch strings.ToUpper(string(ctx.Request().Header.Method())) {
-	case "GET":
+	case fiber.MethodGet:
 		err = ctx.QueryParser(rt)
 		if err != nil {
 			return err
 		}
-	case "POST", "PUT":
+	case fiber.MethodPost, fiber.MethodPut:
 		err = ctx.BodyParser(rt)
 		if err != nil {
 			return err
@@ -148,13 +148,14 @@ func Shutdown() (err error) {
 
 const codeTemp = `package code
 
-const OK = 200
+const OK = 0
 const OKMsg = "ok"
 
 
 const (
 	SystemErrorCode    = -1 //系统级别错误
-	UndefinedErrorCode = 0  //没有定义错误类型的都用这个
+	CommonErrorCode = 0  //通用错误类型的都用这个
+	VerifyErrorCode = 400  //表单验证不通过
 )
 `
 
@@ -264,7 +265,6 @@ type BootTemp struct {
 const bootTemp = `package boot
 
 import (
-	"{{ .ModName }}/internal/app"
 	"{{ .ModName }}/internal/config"
 	"{{ .ModName }}/internal/fiber"
 	"flag"

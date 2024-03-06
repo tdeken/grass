@@ -216,3 +216,11 @@ func RunCommand(dir, name string, args ...string) (err error) {
 
 	return
 }
+
+// PkgAndStruct 得到包和边准包类型名称
+func PkgAndStruct(path string) (pkg, str string) {
+	pkg = path[strings.LastIndex(path, "/")+1:]
+
+	str = CamelString(pkg)
+	return
+}

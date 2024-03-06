@@ -4,11 +4,11 @@ type ProtoYamlFile struct {
 	ModName string `json:"mod_name"`
 }
 
-const protoYamlFile = `## NOT EDIT; NOT EDIT; NOT EDIT
+const protoYamlFile = `mod_name: {{ .ModName }}
 
-mod_name: {{ .ModName }}
-
-source: proto
+proto: 
+  path: proto
+  file_type: json # json toml
 
 analyze:
   sources: api/http
