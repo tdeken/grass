@@ -101,6 +101,7 @@ func ffn(fields string) (field Field) {
 	for _, arr := range arrs {
 		k, val, _ := strings.Cut(arr, "=")
 
+		k, val = strings.TrimSpace(k), strings.TrimSpace(val)
 		switch k {
 		case "n":
 			field.Name = val
