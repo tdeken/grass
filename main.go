@@ -45,7 +45,7 @@ func init() {
 	fs.StringVar(&params.FiberWebInit, "fbinit", "", "create fiber web frame")
 
 	// build fiber action
-	fs.StringVar(&params.FiberWeb, "fb", "", "build fiber action \r\n es: -fb [dir]")
+	fs.StringVar(&params.FiberWeb, "fb", "", "build fiber action \r\n es: -fb demo -d [dir]")
 
 	// build fiber action
 	fs.StringVar(&params.Proto, "bp", "", "build proto name")
@@ -56,8 +56,8 @@ func init() {
 func parse() {
 	var args = os.Args[1:]
 	if err := fs.Parse(args); err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
+		fs.PrintDefaults()
+		os.Exit(0)
 	}
 
 	if params.FiberWebInit != "" {
@@ -81,7 +81,7 @@ func main() {
 	case sceneFiberWebInit:
 		build = fiberweb.NewFiberWeb(params.FiberWebInit)
 	case sceneFiberWeb:
-		build = fiberaction.NewFiberAction(params.FiberWeb)
+		build = fiberaction.NewFiberAction(params.Dir, params.FiberWeb)
 	case sceneProto:
 		build = createproto.NewCreateProto(params.Dir, params.Proto)
 	}

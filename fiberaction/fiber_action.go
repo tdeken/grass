@@ -11,7 +11,8 @@ import (
 
 type FiberAction struct {
 	basic.Basic
-	conf basic.GrassConf
+	conf       basic.GrassConf
+	moduleName string
 }
 
 func (s *FiberAction) Error() (err error) {
@@ -23,11 +24,13 @@ func (s *FiberAction) Error() (err error) {
 }
 
 // NewFiberAction create_project
-func NewFiberAction(modName string) *FiberAction {
+func NewFiberAction(rootDir string, moduleName string) *FiberAction {
 	fa := new(FiberAction)
 	{
-		fa.Init(modName)
+		fa.Init(rootDir)
 	}
+
+	fa.moduleName = moduleName
 
 	return fa
 }
@@ -63,6 +66,13 @@ func (s *FiberAction) loadConf() (err error) {
 	err = yaml.Unmarshal(in, &s.conf)
 	if err != nil {
 		err = errors.New(fmt.Sprintf("读取grass.yaml参数异常: %v", err))
+		return
+	}
+
+	protoDir := s.PrefixDir(fmt.Sprintf("%s/%s/%s.yaml", s.Dir, s.moduleName, s.moduleName))
+	exist, _ := utils.IsFileExist(protoDir)
+	if !exist {
+		err = errors.New(fmt.Sprintf("找不到当前模块的%s.yaml文件，请通过 -bp 创建", s.moduleName))
 		return
 	}
 

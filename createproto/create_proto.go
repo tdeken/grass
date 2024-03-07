@@ -78,5 +78,18 @@ func (s *CreateProto) dir() (err error) {
 		return
 	}
 
+	content, err := utils.CreateTmp(ProtoTemp{
+		Route: s.moduleName,
+	}, protoTemp)
+	if err != nil {
+		return
+	}
+
+	filename := fmt.Sprintf("%s/%s.yaml", mDir, s.moduleName)
+	err = utils.NotExistCreateFile(filename, content)
+	if err != nil {
+		return
+	}
+
 	return
 }
