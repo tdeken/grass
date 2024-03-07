@@ -27,6 +27,7 @@ type Args struct {
 	FiberWeb     string // build fiber action
 	Proto        string // build proto
 	Dir          string // root dir
+	Temp         bool   // template build
 }
 
 var help bool
@@ -49,7 +50,10 @@ func init() {
 
 	// build fiber action
 	fs.StringVar(&params.Proto, "bp", "", "build proto name")
+
+	// params
 	fs.StringVar(&params.Dir, "d", "", "root dir name")
+	fs.BoolVar(&params.Temp, "t", false, "example file build")
 }
 
 // 解析命令行参数
@@ -83,7 +87,7 @@ func main() {
 	case sceneFiberWeb:
 		build = fiberaction.NewFiberAction(params.Dir, params.FiberWeb)
 	case sceneProto:
-		build = createproto.NewCreateProto(params.Dir, params.Proto)
+		build = createproto.NewCreateProto(params.Dir, params.Proto, params.Temp)
 	}
 
 	if build == nil {

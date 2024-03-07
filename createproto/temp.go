@@ -33,3 +33,107 @@ contact:
   name: ""
   url: ""
   email: ""`
+
+const exampleTemp = `{
+  "group": {
+    "name": "Example",
+    "desc": "示例接口组"
+  },
+  "interfaces": [
+    {
+      "name": "Example",
+      "desc": "示例接口",
+      "method": "POST",
+      "mid_type": "mid_key",
+      "msgs": [
+        {
+          "name": "MsgsExample",
+          "fields": [
+            {"name": "example_1", "class": "string", "desc": "oss accessKeyId"},
+            {"name": "example_2", "class": "int64", "desc": "oss accessKeyId"},
+            {"name": "example_3", "class": "[]string", "desc": "oss accessKeyId"}
+          ]
+        },
+        {
+          "name": "MsgsExample2",
+          "fields": [
+            {"name": "example_1", "class": "string", "desc": "oss accessKeyId"},
+            {"name": "example_2", "class": "[]string", "desc": "oss accessKeyId"},
+            {"name": "example_3", "class": "[]~MsgsExample", "desc": "oss accessKeyId"},
+            {"name": "example_4", "class": "~MsgsExample", "desc": "oss accessKeyId"}
+          ]
+        }
+      ],
+      "req": {
+        "fields": [
+          {"name": "id", "class": "string", "desc": "id", "validate": "required"}
+        ]
+      },
+      "res": {
+        "fields": [
+          {"name": "msgs_example", "class": "[]~MsgsExample2", "desc": "msgs_example"},
+          {"name": "name", "class": "string", "desc": "name"},
+          {"name": "age", "class": "float64", "desc": "age"},
+          {"name": "games", "class": "[]?Game", "desc": "games"},
+          {"name": "next_play", "class": "?Game", "desc": "games"},
+          {"name": "play", "class": "&Game", "desc": "games"}
+        ],
+        "messages": [
+          {
+            "name": "Game",
+            "fields": [
+              {"name": "name", "class": "string", "desc": "name"},
+              {"name": "time", "class": "int32", "desc": "time"}
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}`
+
+const exampleTomlTemp = `[group]
+name = "Example"
+desc = "示例接口组"
+
+[[interfaces]]
+name = "Example"
+desc = "示例接口"
+method = "POST"
+mid_type = "mid_key"
+[[interfaces.msgs]]
+name = "MsgsExample"
+fields = [
+    "n=example_1;c=string;d=example_1",
+    "n=example_2;c=string;d=example_2",
+    "n=example_3;c=string;d=example_3",
+]
+[[interfaces.msgs]]
+name = "MsgsExample2"
+fields = [
+    "n=example_1;c=string;d=example_1",
+    "n=example_2;c=string;d=example_2",
+    "n=example_3;c=string;d=example_3",
+]
+
+[interfaces.req]
+fileds = [
+    "n=id;c=string;d=id;v=required",
+]
+
+[interfaces.res]
+fileds = [
+    "n=example_1;c=[]~MsgsExample2;d=msgs_example",
+    "n=name;c=string;d=name",
+    "n=age;c=float64;d=age",
+    "n=games;c=[]?Game;d=games",
+    "n=next_play;c=?Game;d=next_play",
+    "n=play;c=&Game;d=play",
+]
+[[interfaces.res.messages]]
+name="Game"
+fields = [
+    "n=name;c=string;d=name",
+    "n=time;c=int32;d=time",
+]
+`

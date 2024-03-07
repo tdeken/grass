@@ -13,6 +13,7 @@ type CreateProto struct {
 	basic.Basic
 	conf       basic.GrassConf
 	moduleName string
+	temp       bool
 }
 
 func (s *CreateProto) Error() error {
@@ -24,8 +25,8 @@ func (s *CreateProto) Error() error {
 }
 
 // NewCreateProto create proto
-func NewCreateProto(dir, proto string) *CreateProto {
-	cp := &CreateProto{moduleName: proto}
+func NewCreateProto(dir, proto string, temp bool) *CreateProto {
+	cp := &CreateProto{moduleName: proto, temp: temp}
 	cp.Init(dir)
 
 	return cp
@@ -87,6 +88,28 @@ func (s *CreateProto) dir() (err error) {
 
 	filename := fmt.Sprintf("%s/%s.yaml", mDir, s.moduleName)
 	err = utils.NotExistCreateFile(filename, content)
+	if err != nil || !s.temp {
+		return
+	}
+
+	var temp, tempFile string
+
+	switch s.conf.Proto.FileType {
+	case "json":
+		temp, err = utils.CreateTmp(nil, exampleTemp)
+		if err != nil {
+			return
+		}
+		tempFile = fmt.Sprintf("%s/example.json", mDir)
+	case "toml":
+		temp, err = utils.CreateTmp(nil, exampleTomlTemp)
+		if err != nil {
+			return
+		}
+		tempFile = fmt.Sprintf("%s/example.toml", mDir)
+	}
+
+	err = utils.NotExistCreateFile(tempFile, temp)
 	if err != nil {
 		return
 	}
