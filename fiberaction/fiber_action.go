@@ -104,7 +104,7 @@ func (s *FiberAction) dir() (err error) {
 
 	hdlPkg, hdlStruct := utils.PkgAndStruct(s.conf.Analyze.Handler)
 	hdl, err := utils.CreateTmp(HandlerTemp{
-		ModName: s.ModName,
+		ModName: s.conf.ModName,
 		Pkg:     hdlPkg,
 		Handler: hdlStruct,
 	}, handlerTemp)

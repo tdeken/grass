@@ -32,7 +32,7 @@ func (s *CreateProject) Run() {
 		return
 	}
 
-	err = utils.RunCommand(s.Dir, "go", "mod", "init", s.ModName)
+	err = utils.RunCommand(s.Dir, "go", "mod", "init", s.Dir)
 	if err != nil {
 		return
 	}
@@ -56,7 +56,7 @@ func (s *CreateProject) etc() (err error) {
 	}
 
 	content, err := utils.CreateTmp(ProtoYamlFile{
-		ModName: s.ModName,
+		ModName: s.Dir,
 	}, protoYamlFile)
 	if err != nil {
 		return

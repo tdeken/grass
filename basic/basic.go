@@ -5,14 +5,12 @@ import (
 )
 
 type Basic struct {
-	Dir     string
-	ModName string
-	Err     error
+	Dir string
+	Err error
 }
 
-func (s *Basic) Init(modName string) {
-	s.Dir = modName[strings.LastIndex(modName, "/")+1:]
-	s.ModName = modName
+func (s *Basic) Init(dirPath string) {
+	s.Dir = dirPath[strings.LastIndex(dirPath, "/")+1:]
 	s.Err = nil
 }
 
