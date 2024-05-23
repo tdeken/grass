@@ -11,7 +11,7 @@ proto:
   file_type: json # json toml
 
 analyze:
-  sources: api/http
+  sources: internal/meet
   handler: internal/handler
   service: internal/service
 

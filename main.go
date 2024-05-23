@@ -43,12 +43,12 @@ func init() {
 	flag.BoolVar(&help, "help", false, "grass options help")
 
 	// create fiber web frame init
-	fs.StringVar(&params.FiberWebInit, "fbinit", "", "create fiber web frame")
+	fs.StringVar(&params.FiberWebInit, "fbinit", "", "create fiber web frame \r\n es: -fbinit demo")
 
 	// build fiber action
 	fs.StringVar(&params.FiberWeb, "fb", "", "build fiber action \r\n es: -fb demo -d [dir]")
 
-	// build fiber action
+	// build proto file
 	fs.StringVar(&params.Proto, "bp", "", "build proto name")
 
 	// params

@@ -5,13 +5,10 @@ import (
 	"fmt"
 	"github.com/tdeken/grass/basic"
 	"github.com/tdeken/grass/utils"
-	"gopkg.in/yaml.v3"
-	"os"
 )
 
 type CreateProto struct {
 	basic.Basic
-	conf       basic.GrassConf
 	moduleName string
 	temp       bool
 }
@@ -39,7 +36,7 @@ func (s *CreateProto) Run() {
 		s.Err = err
 	}()
 
-	err = s.loadConf()
+	err = s.LoadConf()
 	if err != nil {
 		return
 	}
@@ -52,26 +49,8 @@ func (s *CreateProto) Run() {
 	return
 }
 
-func (s *CreateProto) loadConf() (err error) {
-	cfd := s.PrefixDir(fmt.Sprintf("etc/grass.yaml"))
-
-	in, err := os.ReadFile(cfd)
-	if err != nil {
-		err = errors.New(fmt.Sprintf("读取grass.yaml失败: %v", err))
-		return
-	}
-
-	err = yaml.Unmarshal(in, &s.conf)
-	if err != nil {
-		err = errors.New(fmt.Sprintf("读取grass.yaml参数异常: %v", err))
-		return
-	}
-
-	return
-}
-
 func (s *CreateProto) dir() (err error) {
-	protoDir := s.PrefixDir(s.conf.Proto.Path)
+	protoDir := s.PrefixDir(s.Conf.Proto.Path)
 	mDir := protoDir + "/" + s.moduleName
 
 	err = utils.MkDirAll(mDir)
@@ -94,7 +73,7 @@ func (s *CreateProto) dir() (err error) {
 
 	var temp, tempFile string
 
-	switch s.conf.Proto.FileType {
+	switch s.Conf.Proto.FileType {
 	case "json":
 		temp, err = utils.CreateTmp(nil, exampleTemp)
 		if err != nil {

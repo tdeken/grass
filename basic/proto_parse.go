@@ -20,6 +20,7 @@ type Group struct {
 	Desc        string `json:"desc"`         //组描述
 	Tags        string `json:"tags"`         //swagger分组，空的时候，默认是组描述
 	NotRegister bool   `json:"not_register"` //不注册
+	NotRoute    bool   `json:"not_route"`    //不设置该组路由
 }
 
 type Interface struct {
@@ -234,4 +235,25 @@ type TomlMessage struct {
 type TomlMsg struct {
 	Name   string   `toml:"name"`   //结构体名称
 	Fields []string `toml:"fields"` //结构体参数
+}
+
+type Doc struct {
+	Title   string   `yaml:"title"`
+	Desc    string   `yaml:"desc"`
+	Route   string   `yaml:"route"`
+	Schemes []string `yaml:"schemes"`
+	Host    string   `yaml:"host"`
+	Ver     string   `yaml:"ver"`
+	Auth    struct {
+		Security string `yaml:"security"`
+		Title    string `yaml:"title"`
+		In       string `yaml:"in"`
+		Name     string `yaml:"name"`
+		Token    string `yaml:"token"`
+	} `yaml:"auth"`
+	Contact struct {
+		Name  string `yaml:"name"`
+		Url   string `yaml:"url"`
+		Email string `yaml:"email"`
+	} `yaml:"contact"`
 }

@@ -11,7 +11,6 @@ import (
 
 type FiberAction struct {
 	basic.Basic
-	conf       basic.GrassConf
 	moduleName string
 }
 
@@ -51,6 +50,69 @@ func (s *FiberAction) Run() {
 		return
 	}
 
+	err = s.meet()
+	if err != nil {
+		return
+	}
+
+	err = s.service()
+	if err != nil {
+		return
+	}
+
+	err = s.handler()
+	if err != nil {
+		return
+	}
+
+	err = s.route()
+	if err != nil {
+		return
+	}
+
+	return
+}
+
+func (s *FiberAction) route() (err error) {
+	path := s.PrefixDir(s.Conf.Analyze.Handler)
+
+	entrys, err := os.ReadDir(path)
+	if err != nil {
+		return
+	}
+
+	var er = RouteTemp{
+		Pkgs:    nil,
+		Modules: nil,
+	}
+	for _, v := range entrys {
+		if !v.IsDir() {
+			continue
+		}
+
+		var pkg = s.PrefixDir(fmt.Sprintf("%s/%s", s.Conf.Analyze.Handler, v.Name()))
+		var exit bool
+		exit, err = utils.IsFileExist(pkg + "/controller.gen.go")
+		if err != nil {
+			return
+		}
+
+		if exit {
+			er.Modules = append(er.Modules, v.Name())
+			er.Pkgs = append(er.Pkgs, pkg)
+		}
+	}
+
+	text, err := utils.CreateTmp(er, routeTemp)
+	if err != nil {
+		return
+	}
+
+	err = utils.CreateFile(s.PrefixDir("internal/fiber/route/route.gen.go"), text)
+	if err != nil {
+		return
+	}
+
 	return
 }
 
@@ -63,16 +125,16 @@ func (s *FiberAction) loadConf() (err error) {
 		return
 	}
 
-	err = yaml.Unmarshal(in, &s.conf)
+	err = yaml.Unmarshal(in, &s.Conf)
 	if err != nil {
 		err = errors.New(fmt.Sprintf("读取grass.yaml参数异常: %v", err))
 		return
 	}
 
-	protoDir := s.PrefixDir(fmt.Sprintf("%s/%s/%s.yaml", s.Dir, s.moduleName, s.moduleName))
+	protoDir := s.PrefixDir(fmt.Sprintf("%s/%s/%s.yaml", s.Conf.Proto.Path, s.moduleName, s.moduleName))
 	exist, _ := utils.IsFileExist(protoDir)
 	if !exist {
-		err = errors.New(fmt.Sprintf("找不到当前模块的%s.yaml文件，请通过 -bp 创建", s.moduleName))
+		err = errors.New(fmt.Sprintf("找不到当前模块的%s文件，请通过 -bp 创建", protoDir))
 		return
 	}
 
@@ -80,14 +142,14 @@ func (s *FiberAction) loadConf() (err error) {
 }
 
 func (s *FiberAction) dir() (err error) {
-	serDir, hdlDir, srsDir := s.PrefixDir(s.conf.Analyze.Service), s.PrefixDir(s.conf.Analyze.Handler), s.PrefixDir(s.conf.Analyze.Sources)
+	serDir, hdlDir, srsDir := s.PrefixDir(s.Conf.Analyze.Service), s.PrefixDir(s.Conf.Analyze.Handler), s.PrefixDir(s.Conf.Analyze.Sources)
 
 	err = utils.MkDirAll(serDir, hdlDir, srsDir)
 	if err != nil {
 		return
 	}
 
-	serPkg, serStruct := utils.PkgAndStruct(s.conf.Analyze.Service)
+	serPkg, serStruct := utils.PkgAndStruct(s.Conf.Analyze.Service)
 	ser, err := utils.CreateTmp(ServiceTemp{
 		Pkg:     serPkg,
 		Service: serStruct,
@@ -102,9 +164,9 @@ func (s *FiberAction) dir() (err error) {
 		return
 	}
 
-	hdlPkg, hdlStruct := utils.PkgAndStruct(s.conf.Analyze.Handler)
+	hdlPkg, hdlStruct := utils.PkgAndStruct(s.Conf.Analyze.Handler)
 	hdl, err := utils.CreateTmp(HandlerTemp{
-		ModName: s.conf.ModName,
+		ModName: s.Conf.ModName,
 		Pkg:     hdlPkg,
 		Handler: hdlStruct,
 	}, handlerTemp)
@@ -119,4 +181,16 @@ func (s *FiberAction) dir() (err error) {
 	}
 
 	return
+}
+
+func (s *FiberAction) meet() (err error) {
+	return newCreateMeet(s.Basic, s.moduleName).run()
+}
+
+func (s *FiberAction) service() (err error) {
+	return newCreateService(s.Basic, s.moduleName).run()
+}
+
+func (s *FiberAction) handler() (err error) {
+	return newCreateHandler(s.Basic, s.moduleName).run()
 }

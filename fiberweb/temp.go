@@ -91,9 +91,9 @@ func Json(ctx *fiber.Ctx, res any, err error) error {
 	var crr *code.Error
 	if err != nil {
 		var ok bool
-		crr, ok = err.(*code.Error)
+		crr, ok = code.As(err)
 		if !ok {
-			crr = code.NewError(code.UndefinedErrorCode, err.Error())
+			crr = code.NewError(code.CommonErrorCode, err.Error())
 		}
 	}
 
@@ -163,6 +163,7 @@ const codeErrorTemp = `package code
 
 import (
 	"encoding/json"
+	"errors"
 )
 
 type Error struct {
@@ -203,6 +204,15 @@ func NewError(code int32, detail string) *Error {
 // NewFormError 实例化一个有来源的错误
 func NewFormError(code int32, detail, form string) *Error {
 	return &Error{Form: form, Code: code, Detail: detail}
+}
+
+// As 切换成错误
+func As(err error) (e *Error, ok bool) {
+	ok = errors.As(err, &e)
+	if !ok {
+		return
+	}
+	return err.(*Error), true
 }
 `
 

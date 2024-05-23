@@ -1,13 +1,11 @@
 package fiberweb
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"github.com/tdeken/grass/basic"
 	"github.com/tdeken/grass/createproject"
 	"github.com/tdeken/grass/utils"
-	"os/exec"
 )
 
 type FiberWeb struct {
@@ -71,14 +69,9 @@ func (s *FiberWeb) Run() {
 		return
 	}
 
-	var out bytes.Buffer
-	cmd := exec.Command("go", "mod", "tidy")
-	cmd.Dir = s.Dir
-	cmd.Stderr = &out
-
-	err = cmd.Run()
+	err = utils.RunCommand(s.Dir, "go", "mod", "tidy")
+	err = utils.RunCommand(s.Dir, "go", "get", "github.com/tdeken/fiberaction@v0.1.0")
 	if err != nil {
-		err = errors.New(out.String())
 		return
 	}
 
@@ -173,7 +166,7 @@ func (s *FiberWeb) route() (err error) {
 		return
 	}
 
-	filename := s.fiberDir + "/route/route.go"
+	filename := s.fiberDir + "/route/route.gen.go"
 	err = utils.NotExistCreateFile(filename, content)
 	if err != nil {
 		return
