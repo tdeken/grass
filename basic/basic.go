@@ -3,6 +3,7 @@ package basic
 import (
 	"errors"
 	"fmt"
+	"github.com/tdeken/grass/utils"
 	"gopkg.in/yaml.v3"
 	"os"
 	"strings"
@@ -15,6 +16,9 @@ type Basic struct {
 }
 
 func (s *Basic) Init(dirPath string) {
+
+	_ = utils.MkDirAll(dirPath)
+
 	s.Dir = dirPath
 	s.Err = nil
 }

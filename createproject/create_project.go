@@ -5,19 +5,21 @@ import (
 	"fmt"
 	"github.com/tdeken/grass/basic"
 	"github.com/tdeken/grass/utils"
-	"strings"
 )
 
 type CreateProject struct {
 	basic.Basic
+	modName string
 }
 
 // NewCreateProject create_project
-func NewCreateProject(dirPath string) *CreateProject {
+func NewCreateProject(modName, dirPath string) *CreateProject {
 	cp := new(CreateProject)
 	{
 		cp.Init(dirPath)
 	}
+
+	cp.modName = modName
 
 	return cp
 }
@@ -33,7 +35,7 @@ func (s *CreateProject) Run() {
 		return
 	}
 
-	err = utils.RunCommand(s.Dir, "go", "mod", "init", s.Dir[strings.LastIndex(s.Dir, "/")+1:])
+	err = utils.RunCommand(s.Dir, "go", "mod", "init", s.modName)
 	if err != nil {
 		return
 	}
@@ -57,7 +59,7 @@ func (s *CreateProject) etc() (err error) {
 	}
 
 	content, err := utils.CreateTmp(ProtoYamlFile{
-		ModName: s.Dir[strings.LastIndex(s.Dir, "/")+1:],
+		ModName: s.modName,
 	}, protoYamlFile)
 	if err != nil {
 		return

@@ -16,7 +16,7 @@ analyze:
   service: internal/service
 
 swagger:
-  path: api/swagger
+  path: doc
   code: code
   msg: msg
   data: data`

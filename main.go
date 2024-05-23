@@ -83,7 +83,7 @@ func main() {
 	var build Build
 	switch params.scene {
 	case sceneFiberWebInit:
-		build = fiberweb.NewFiberWeb(params.FiberWebInit)
+		build = fiberweb.NewFiberWeb(params.FiberWebInit, params.Dir)
 	case sceneFiberWeb:
 		build = fiberaction.NewFiberAction(params.Dir, params.FiberWeb)
 	case sceneProto:

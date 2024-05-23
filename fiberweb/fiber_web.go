@@ -6,21 +6,32 @@ import (
 	"github.com/tdeken/grass/basic"
 	"github.com/tdeken/grass/createproject"
 	"github.com/tdeken/grass/utils"
+	"strings"
 )
 
 type FiberWeb struct {
 	basic.Basic
 	fiberDir string
+	modName  string
 }
 
 // NewFiberWeb create_project
-func NewFiberWeb(modName string) *FiberWeb {
+func NewFiberWeb(modName, dir string) *FiberWeb {
+
+	if dir == "" {
+		dir = modName
+	}
+
 	fw := new(FiberWeb)
 	{
-		fw.Init(modName)
+		fw.Init(dir)
 	}
 
 	fw.fiberDir = fmt.Sprintf("%s/internal/fiber", fw.Dir)
+	fw.modName = modName
+	if fw.modName == "" {
+		fw.modName = fw.fiberDir[strings.LastIndex(fw.fiberDir, "/")+1:]
+	}
 
 	return fw
 }
@@ -80,7 +91,7 @@ func (s *FiberWeb) Run() {
 
 // createProject init project env
 func (s *FiberWeb) createProject() error {
-	cp := createproject.NewCreateProject(s.Dir)
+	cp := createproject.NewCreateProject(s.modName, s.Dir)
 	cp.Run()
 	return cp.Error()
 }
@@ -211,7 +222,7 @@ func (s *FiberWeb) code() (err error) {
 
 // result response data struct
 func (s *FiberWeb) result() (err error) {
-	content, err := utils.CreateTmp(FiberResultTemp{ModName: s.Dir}, fiberResultTemp)
+	content, err := utils.CreateTmp(FiberResultTemp{ModName: s.modName}, fiberResultTemp)
 	if err != nil {
 		return
 	}
@@ -227,7 +238,7 @@ func (s *FiberWeb) result() (err error) {
 
 // fiber response data struct
 func (s *FiberWeb) fiberMain() (err error) {
-	content, err := utils.CreateTmp(FiberTemp{ModName: s.Dir}, fiberTemp)
+	content, err := utils.CreateTmp(FiberTemp{ModName: s.modName}, fiberTemp)
 	if err != nil {
 		return
 	}
@@ -287,7 +298,7 @@ func (s *FiberWeb) boot() (err error) {
 		return
 	}
 
-	content, err := utils.CreateTmp(BootTemp{ModName: s.Dir}, bootTemp)
+	content, err := utils.CreateTmp(BootTemp{ModName: s.modName}, bootTemp)
 	if err != nil {
 		return
 	}
@@ -305,7 +316,7 @@ func (s *FiberWeb) boot() (err error) {
 func (s *FiberWeb) main() (err error) {
 
 	content, err := utils.CreateTmp(MainTemp{
-		ModName: s.Dir,
+		ModName: s.modName,
 		Spc:     "<-",
 	}, mainTemp)
 	if err != nil {
@@ -318,7 +329,7 @@ func (s *FiberWeb) main() (err error) {
 		return
 	}
 
-	content, err = utils.CreateTmp(DockerfileTemp{ModName: s.Dir}, dockerfileTemp)
+	content, err = utils.CreateTmp(DockerfileTemp{ModName: s.modName}, dockerfileTemp)
 	if err != nil {
 		return
 	}

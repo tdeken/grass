@@ -8,6 +8,6 @@
 
     grass -h or grass -help
 
-## CreateProject
+## CreateFiber
 
-    grass -cp mod_name (eg. grass -cp github.com/tdeken/grass)
+    grass -fbinit mod_name -d [dir] (eg. grass -cp -fbinit demo)
