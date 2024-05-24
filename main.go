@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/tdeken/grass/action"
 	"github.com/tdeken/grass/createproto"
-	"github.com/tdeken/grass/fiberaction"
-	"github.com/tdeken/grass/fiberweb"
+	"github.com/tdeken/grass/web"
 	"os"
 )
 
@@ -16,18 +16,22 @@ type Build interface {
 
 const (
 	sceneCreateNone = iota
-	sceneFiberWebInit
+	sceneFiberInit
+	sceneGinInit
 	sceneFiberWeb
+	sceneGinWeb
 	sceneProto
 )
 
 type Args struct {
-	scene        int    // what you  will do scene
-	FiberWebInit string // fiber web frame init
-	FiberWeb     string // build fiber action
-	Proto        string // build proto
-	Dir          string // root dir
-	Temp         bool   // template build
+	scene     int    // what you  will do scene
+	FiberInit string // fiber web frame init
+	GinInit   string // gin web frame init
+	FiberWeb  string // build fiber action
+	GinWeb    string // build gin action
+	Proto     string // build proto
+	Dir       string // root dir
+	Temp      bool   // template build
 }
 
 var help bool
@@ -43,10 +47,16 @@ func init() {
 	flag.BoolVar(&help, "help", false, "grass options help")
 
 	// create fiber web frame init
-	fs.StringVar(&params.FiberWebInit, "fbinit", "", "create fiber web frame \r\n es: -fbinit demo")
+	fs.StringVar(&params.FiberInit, "fbinit", "", "create fiber web frame \r\n es: -fbinit demo")
+
+	// create gin web frame init
+	fs.StringVar(&params.GinInit, "gninit", "", "create gin web frame \r\n es: -gninit demo")
 
 	// build fiber action
 	fs.StringVar(&params.FiberWeb, "fb", "", "build fiber action \r\n es: -fb demo -d [dir]")
+
+	// build gin action
+	fs.StringVar(&params.GinWeb, "gn", "", "build fiber action \r\n es: -gn demo -d [dir]")
 
 	// build proto file
 	fs.StringVar(&params.Proto, "bp", "", "build proto name")
@@ -64,10 +74,14 @@ func parse() {
 		os.Exit(0)
 	}
 
-	if params.FiberWebInit != "" {
-		params.scene = sceneFiberWebInit
+	if params.FiberInit != "" {
+		params.scene = sceneFiberInit
+	} else if params.GinInit != "" {
+		params.scene = sceneGinInit
 	} else if params.FiberWeb != "" {
 		params.scene = sceneFiberWeb
+	} else if params.GinWeb != "" {
+		params.scene = sceneGinWeb
 	} else if params.Proto != "" {
 		params.scene = sceneProto
 	}
@@ -82,10 +96,14 @@ func parse() {
 func main() {
 	var build Build
 	switch params.scene {
-	case sceneFiberWebInit:
-		build = fiberweb.NewFiberWeb(params.FiberWebInit, params.Dir)
+	case sceneFiberInit:
+		build = web.NewFiber(params.FiberInit, params.Dir)
+	case sceneGinInit:
+		build = web.NewGin(params.GinInit, params.Dir)
 	case sceneFiberWeb:
-		build = fiberaction.NewFiberAction(params.Dir, params.FiberWeb)
+		build = action.NewFiber(params.Dir, params.FiberWeb)
+	case sceneGinWeb:
+		build = action.NewGin(params.Dir, params.GinWeb)
 	case sceneProto:
 		build = createproto.NewCreateProto(params.Dir, params.Proto, params.Temp)
 	}

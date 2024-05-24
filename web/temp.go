@@ -1,4 +1,4 @@
-package fiberweb
+package web
 
 import "html/template"
 
@@ -61,7 +61,7 @@ func newValidate() *validator.Validate {
 }
 `
 
-const fiberRouteTemp = `//DO NOT EDIT.
+const routeTemp = `//DO NOT EDIT.
 
 package route
 
@@ -142,7 +142,13 @@ func Shutdown() (err error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	return server.Web.Server.ShutdownWithContext(ctx)
+	if err = server.Web.Server.ShutdownWithContext(ctx); err != nil {
+		return
+	}
+
+	// 给3秒时间，处理剩余程序未处理内容
+	time.Sleep(3 * time.Second)
+	return
 }
 `
 
@@ -268,11 +274,11 @@ server:
   port: "13100"
 `
 
-type BootTemp struct {
+type FiberBootTemp struct {
 	ModName string
 }
 
-const bootTemp = `package boot
+const fiberBootTemp = `package boot
 
 import (
 	"{{ .ModName }}/internal/config"
@@ -384,4 +390,200 @@ COPY --from=build /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
 ENTRYPOINT [ "/{{ .ModName }}", "-env" ]
 CMD ["prod"]
+`
+
+const ginServerTemp = `package server
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+type WebServer struct {
+	Server *gin.Engine
+}
+
+var Web = server()
+
+func server() *WebServer {
+	ser := gin.New()
+
+	return &WebServer{
+		Server: ser,
+	}
+}
+`
+
+type GinResultTemp struct {
+	ModName string
+}
+
+const ginResultTemp = `package result
+
+import (
+	"{{ .ModName }}/internal/code"
+	"github.com/gin-gonic/gin"
+)
+
+type WebResult struct {
+	Code int32  ` + "`json:" + `"code"` + "`" + ` //错误码
+	Msg  string ` + "`json:" + `"msg"` + "`" + `  //返回的消息
+	Data any    ` + "`json:" + `"data"` + "`" + ` //返回的数据结果
+}
+
+func Json(ctx *gin.Context, res any, err error) {
+	var crr *code.Error
+	if err != nil {
+		var ok bool
+		crr, ok = code.As(err)
+		if !ok {
+			crr = code.NewError(code.CommonErrorCode, err.Error())
+		}
+	}
+
+	var data = res
+	if data == nil {
+		data = make(map[string]interface{})
+	}
+
+	ctx.JSON(200, WebResult{
+		Code: crr.GetCode(),
+		Msg:  crr.GetDetail(),
+		Data: data,
+	})
+
+	return
+}
+`
+
+type GinBootTemp struct {
+	ModName string
+}
+
+const ginBootTemp = `package boot
+
+import (
+	"{{ .ModName }}/internal/config"
+	"{{ .ModName }}/internal/gin"
+	"flag"
+	"fmt"
+	"log"
+)
+
+// Init 初始化项目配置
+func Init() {
+	var env string
+	flag.StringVar(&env, "env", "local", "启动环境")
+	flag.Parse()
+
+	err := config.LoadConfig(config.FilePath{
+		ConfigName: fmt.Sprintf("config-%s", env),
+		ConfigType: "yaml",
+		ConfigPath: "etc",
+	})
+	if err != nil {
+		log.Fatalf("配置文件加载失败:%v", err)
+	}
+
+}
+
+func Run() {
+	go gin.Run()
+
+	return
+}
+
+// Shutdown 关闭运行程序
+func Shutdown() {
+	if err := gin.Shutdown(); err != nil {
+		panic(err)
+	}
+}
+`
+
+type GinTemp struct {
+	ModName string
+}
+
+const ginTemp = `package gin
+
+import (
+	"context"
+	"demo/internal/config"
+	"demo/internal/gin/route"
+	"demo/internal/gin/server"
+	"fmt"
+	"net/http"
+	"time"
+)
+
+var ser *http.Server
+
+func Run() (err error) {
+	//注册路由
+	route.Route()
+
+	// do custom route
+
+	ser = &http.Server{
+		Addr:    fmt.Sprintf(":%d", config.Conf.Server.Port),
+		Handler: server.Web.Server,
+	}
+
+	//启动项目
+	if err = ser.ListenAndServe(); err != nil {
+		return
+	}
+	return
+}
+
+func Shutdown() (err error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err = ser.Shutdown(ctx); err != nil {
+		return
+	}
+
+	// 给3秒时间，处理剩余程序未处理内容
+	time.Sleep(3 * time.Second)
+	return
+}
+`
+
+const ginValidateTemp = `package validate
+
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	"strings"
+)
+
+var validate = newValidate()
+
+type RequestInterface any
+
+func CheckParams(ctx *gin.Context, rt RequestInterface) (err error) {
+	switch strings.ToUpper(ctx.Request.Method) {
+	case "GET":
+		err = ctx.BindQuery(rt)
+		if err != nil {
+			return err
+		}
+	case "POST", "PUT":
+		err = ctx.Bind(rt)
+		if err != nil {
+			return err
+		}
+	}
+	err = validate.Struct(rt)
+	return
+}
+
+func newValidate() *validator.Validate {
+	v := validator.New()
+
+	//load custom validate
+
+	return v
+}
 `

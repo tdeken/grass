@@ -74,3 +74,12 @@ func (s *Basic) LoadParses(protoModuleName string) (parses []Parse, err error) {
 
 	return
 }
+
+func (s *Basic) Gofmt(filename string) (err error) {
+	err = utils.RunCommand("", "gofmt", "-w", filename)
+	if err != nil {
+		return
+	}
+
+	return
+}

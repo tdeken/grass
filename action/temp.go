@@ -1,4 +1,4 @@
-package fiberaction
+package action
 
 import "html/template"
 
@@ -159,6 +159,32 @@ func Route() {
 {{ $value }}
 {{ end }}`
 
+var ginHandlerControllerGenTemp = `//DO NOT EDIT.
+
+package {{ .ModuleName }}
+
+import (
+	"{{ .ModName }}/internal/gin/server"
+	"{{ .ModName }}/{{ .ServicePath }}/{{ .ModuleName }}"
+	"github.com/gin-gonic/gin"
+	action "github.com/tdeken/ginaction"
+)
+
+// Route 模块路由
+func Route() {
+	r := server.Web.Server.Group("{{ .ModuleRoute }}")
+	{{ if .HasController }}
+	action.AutoRegister(r{{ range $value := .Controllers }},
+	    {{ $value }}{}{{end}},
+    )
+	{{ else }}
+	action.AutoRegister(r)
+	{{ end }}
+}
+{{ range $value := .Messages }}
+{{ $value }}
+{{ end }}`
+
 type HandlerGroupTemp struct {
 	Name       string
 	Desc       string
@@ -185,7 +211,7 @@ func (s {{ .Name }}) Register() []action.Action {
 }
 
 // 获取依赖服务
-func (s {{ .Name }}) getDep(ctx *fiber.Ctx) {{ .ModuleName }}.{{ .Name }} {
+func (s {{ .Name }}) getDep(ctx *gin.Context) {{ .ModuleName }}.{{ .Name }} {
 	dep := {{ .ModuleName }}.{{ .Name }}{}
 	dep.Init(ctx)
 	return dep
@@ -220,6 +246,28 @@ func (c Controller) ChooseMid(t action.MidType) []fiber.Handler {
 
 `
 
+var ginHandlerControllerTemp = `package {{ .ModuleName }}
+
+import (
+	"{{ .ModName }}/{{ .HandlerPath }}"
+	"github.com/gin-gonic/gin"
+	action "github.com/tdeken/ginaction"
+)
+
+type Controller struct {
+	{{ .HandlerPkg }}.Handler
+}
+
+// ChooseMid 可以选择的服务中间件
+func (c Controller) ChooseMid(t action.MidType) []gin.HandlerFunc {
+	switch t {
+	default:
+		return nil
+	}
+}
+
+`
+
 type HandlerFileTemp struct {
 	ModuleName string
 	ModName    string
@@ -232,6 +280,15 @@ import (
 	"github.com/gofiber/fiber/v2"
 	meet "{{ .ModName }}/{{ .ParamsPath }}/{{ .ModuleName }}"
 	"{{ .ModName }}/internal/fiber/result"
+)
+`
+
+var ginHandlerFileTemp = `package {{ .ModuleName }}
+
+import (
+	"github.com/gin-gonic/gin"
+	meet "{{ .ModName }}/{{ .ParamsPath }}/{{ .ModuleName }}"
+	"{{ .ModName }}/internal/gin/result"
 )
 `
 
@@ -258,6 +315,22 @@ func (s {{ .Group }}) {{ .Name }}(ctx *fiber.Ctx) (e error) {
 }
 `
 
+var ginHandlerFuncTemp = `
+// {{ .Name }} {{ .Desc }}
+// @Router {{ .Route }} [{{ .Method }}]
+func (s {{ .Group }}) {{ .Name }}(ctx *gin.Context) {
+	var form = &meet.{{ .Req }}{}
+	if err := s.ValidateRequest(ctx, form); err != nil {
+		result.Json(ctx, nil, err)
+		return 
+	}
+	
+	res, err := s.getDep(ctx).{{ .Name }}(form)
+	result.Json(ctx, res, err)
+	return 
+}
+`
+
 type RouteTemp struct {
 	Pkgs    []string
 	Modules []string
@@ -275,3 +348,77 @@ func Route() { {{ range $value := .Modules }}
 	{{ $value }}.Route(){{ end }}
 }
 `
+
+type GinServiceTemp struct {
+	Pkg     string
+	Service string
+}
+
+const ginServiceTemp = `package service
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+type Service struct {
+	ctx *gin.Context
+}
+
+func (s *Service) Init(ctx *gin.Context) {
+	s.ctx = ctx
+}
+
+func (s *Service) Context() *gin.Context {
+	return s.ctx
+}
+`
+
+type GinHandlerTemp struct {
+	ModName string
+	Pkg     string
+	Handler string
+}
+
+const ginHandlerTemp = `package {{ .Pkg }}
+
+import (
+	"{{ .ModName }}/internal/code"
+	"{{ .ModName }}/internal/gin/validate"
+	"errors"
+	"fmt"
+	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+	action "github.com/tdeken/ginaction"
+)
+
+type {{ .Handler }} struct {
+}
+
+// ValidateRequest 统一校验请求数据
+func (s {{ .Handler }}) ValidateRequest(ctx *gin.Context, rt validate.RequestInterface) *code.Error {
+	err := validate.CheckParams(ctx, rt)
+	if err != nil {
+		var errMsg string
+		var validationErrors validator.ValidationErrors
+		if errors.As(err, &validationErrors) {
+			for _, er := range err.(validator.ValidationErrors) {
+				errMsg = fmt.Sprintf("错误字段:%v,验证类型:%v:%v,参数值:%v", er.Field(), er.Tag(), er.Param(), er.Value())
+				break
+			}
+		} else {
+			errMsg = err.Error()
+		}
+		return code.NewError(code.VerifyErrorCode, errMsg)
+	}
+
+	return nil
+}
+
+// ChooseMid 可以选择的服务中间件
+func (s {{ .Handler }}) ChooseMid(t action.MidType) (ms []gin.HandlerFunc) {
+	if t == nil {
+		return
+	}
+
+	return
+}`

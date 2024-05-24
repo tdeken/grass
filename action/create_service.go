@@ -1,4 +1,4 @@
-package fiberaction
+package action
 
 import (
 	"bytes"
@@ -99,7 +99,7 @@ func (s *createService) file() (err error) {
 			}
 			file.Close()
 
-			err = utils.RunCommand("", "gofmt", "-w", filename)
+			err = s.Gofmt(filename)
 			if err != nil {
 				return
 			}

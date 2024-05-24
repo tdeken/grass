@@ -1,4 +1,4 @@
-package fiberweb
+package web
 
 import (
 	"errors"
@@ -9,43 +9,43 @@ import (
 	"strings"
 )
 
-type FiberWeb struct {
+type Gin struct {
 	basic.Basic
-	fiberDir string
-	modName  string
+	dir     string
+	modName string
 }
 
-// NewFiberWeb create_project
-func NewFiberWeb(modName, dir string) *FiberWeb {
+// NewGin create_project
+func NewGin(modName, dir string) *Gin {
 
 	if dir == "" {
 		dir = modName
 	}
 
-	fw := new(FiberWeb)
+	fw := new(Gin)
 	{
 		fw.Init(dir)
 	}
 
-	fw.fiberDir = fmt.Sprintf("%s/internal/fiber", fw.Dir)
+	fw.dir = fmt.Sprintf("%s/internal/gin", fw.Dir)
 	fw.modName = modName
 	if fw.modName == "" {
-		fw.modName = fw.fiberDir[strings.LastIndex(fw.fiberDir, "/")+1:]
+		fw.modName = fw.dir[strings.LastIndex(fw.dir, "/")+1:]
 	}
 
 	return fw
 }
 
-func (s *FiberWeb) Error() error {
+func (s *Gin) Error() error {
 	if s.Err == nil {
 		return nil
 	}
 
-	return errors.New(fmt.Sprintf("FiberWeb err: %v", s.Err))
+	return errors.New(fmt.Sprintf("Gin err: %v", s.Err))
 }
 
 // Run do logic
-func (s *FiberWeb) Run() {
+func (s *Gin) Run() {
 	var err error
 	defer func() {
 		s.Err = err
@@ -55,7 +55,7 @@ func (s *FiberWeb) Run() {
 		return
 	}
 
-	err = s.fiber()
+	err = s.gin()
 	if err != nil {
 		return
 	}
@@ -81,7 +81,7 @@ func (s *FiberWeb) Run() {
 	}
 
 	err = utils.RunCommand(s.Dir, "go", "mod", "tidy")
-	err = utils.RunCommand(s.Dir, "go", "get", "github.com/tdeken/fiberaction@v0.1.0")
+	err = utils.RunCommand(s.Dir, "go", "get", "github.com/tdeken/ginaction@v0.1.4")
 	if err != nil {
 		return
 	}
@@ -90,20 +90,20 @@ func (s *FiberWeb) Run() {
 }
 
 // createProject init project env
-func (s *FiberWeb) createProject() error {
+func (s *Gin) createProject() error {
 	cp := createproject.NewCreateProject(s.modName, s.Dir)
 	cp.Run()
 	return cp.Error()
 }
 
 // fiber build fiber dir
-func (s *FiberWeb) fiber() (err error) {
+func (s *Gin) gin() (err error) {
 	err = utils.MkDirAll(
-		s.fiberDir,
-		s.fiberDir+"/server",
-		s.fiberDir+"/route",
-		s.fiberDir+"/result",
-		s.fiberDir+"/validate",
+		s.dir,
+		s.dir+"/server",
+		s.dir+"/route",
+		s.dir+"/result",
+		s.dir+"/validate",
 	)
 
 	if err != nil {
@@ -130,7 +130,7 @@ func (s *FiberWeb) fiber() (err error) {
 		return
 	}
 
-	err = s.fiberMain()
+	err = s.ginMain()
 	if err != nil {
 		return
 	}
@@ -139,13 +139,13 @@ func (s *FiberWeb) fiber() (err error) {
 }
 
 // server fiber run
-func (s *FiberWeb) server() (err error) {
-	content, err := utils.CreateTmp(nil, fiberServerTemp)
+func (s *Gin) server() (err error) {
+	content, err := utils.CreateTmp(nil, ginServerTemp)
 	if err != nil {
 		return
 	}
 
-	filename := s.fiberDir + "/server/server.go"
+	filename := s.dir + "/server/server.go"
 	err = utils.NotExistCreateFile(filename, content)
 	if err != nil {
 		return
@@ -155,13 +155,13 @@ func (s *FiberWeb) server() (err error) {
 }
 
 // validate form validate
-func (s *FiberWeb) validate() (err error) {
-	content, err := utils.CreateTmp(nil, fiberValidateTemp)
+func (s *Gin) validate() (err error) {
+	content, err := utils.CreateTmp(nil, ginValidateTemp)
 	if err != nil {
 		return
 	}
 
-	filename := s.fiberDir + "/validate/validate.go"
+	filename := s.dir + "/validate/validate.go"
 	err = utils.NotExistCreateFile(filename, content)
 	if err != nil {
 		return
@@ -171,13 +171,13 @@ func (s *FiberWeb) validate() (err error) {
 }
 
 // route load route
-func (s *FiberWeb) route() (err error) {
-	content, err := utils.CreateTmp(nil, fiberRouteTemp)
+func (s *Gin) route() (err error) {
+	content, err := utils.CreateTmp(nil, routeTemp)
 	if err != nil {
 		return
 	}
 
-	filename := s.fiberDir + "/route/route.gen.go"
+	filename := s.dir + "/route/route.gen.go"
 	err = utils.NotExistCreateFile(filename, content)
 	if err != nil {
 		return
@@ -187,7 +187,7 @@ func (s *FiberWeb) route() (err error) {
 }
 
 // code error code
-func (s *FiberWeb) code() (err error) {
+func (s *Gin) code() (err error) {
 	dir := fmt.Sprintf("%s/internal/code", s.Dir)
 
 	err = utils.NotExistCreateDir(dir)
@@ -221,13 +221,13 @@ func (s *FiberWeb) code() (err error) {
 }
 
 // result response data struct
-func (s *FiberWeb) result() (err error) {
-	content, err := utils.CreateTmp(FiberResultTemp{ModName: s.modName}, fiberResultTemp)
+func (s *Gin) result() (err error) {
+	content, err := utils.CreateTmp(GinResultTemp{ModName: s.modName}, ginResultTemp)
 	if err != nil {
 		return
 	}
 
-	filename := s.fiberDir + "/result/result.go"
+	filename := s.dir + "/result/result.go"
 	err = utils.NotExistCreateFile(filename, content)
 	if err != nil {
 		return
@@ -237,13 +237,13 @@ func (s *FiberWeb) result() (err error) {
 }
 
 // fiber response data struct
-func (s *FiberWeb) fiberMain() (err error) {
-	content, err := utils.CreateTmp(FiberTemp{ModName: s.modName}, fiberTemp)
+func (s *Gin) ginMain() (err error) {
+	content, err := utils.CreateTmp(GinTemp{ModName: s.modName}, ginTemp)
 	if err != nil {
 		return
 	}
 
-	filename := s.fiberDir + "/fiber.go"
+	filename := s.dir + "/gin.go"
 	err = utils.NotExistCreateFile(filename, content)
 	if err != nil {
 		return
@@ -253,7 +253,7 @@ func (s *FiberWeb) fiberMain() (err error) {
 }
 
 // config load config
-func (s *FiberWeb) config() (err error) {
+func (s *Gin) config() (err error) {
 	dir := s.Dir + "/internal/config"
 
 	err = utils.NotExistCreateDir(dir)
@@ -290,7 +290,7 @@ func (s *FiberWeb) config() (err error) {
 }
 
 // boot load boot
-func (s *FiberWeb) boot() (err error) {
+func (s *Gin) boot() (err error) {
 	dir := s.Dir + "/internal/boot"
 
 	err = utils.NotExistCreateDir(dir)
@@ -298,7 +298,7 @@ func (s *FiberWeb) boot() (err error) {
 		return
 	}
 
-	content, err := utils.CreateTmp(BootTemp{ModName: s.modName}, bootTemp)
+	content, err := utils.CreateTmp(GinBootTemp{ModName: s.modName}, ginBootTemp)
 	if err != nil {
 		return
 	}
@@ -313,7 +313,7 @@ func (s *FiberWeb) boot() (err error) {
 }
 
 // main
-func (s *FiberWeb) main() (err error) {
+func (s *Gin) main() (err error) {
 
 	content, err := utils.CreateTmp(MainTemp{
 		ModName: s.modName,

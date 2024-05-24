@@ -1,4 +1,4 @@
-package fiberaction
+package action
 
 import (
 	"bytes"
@@ -17,12 +17,14 @@ type createHandler struct {
 	basic.Basic
 	protoModuleName string
 	routePrefix     string
+	webMark         string
 }
 
-func newCreateHandler(basic basic.Basic, protoModuleName string) *createHandler {
+func newCreateHandler(basic basic.Basic, protoModuleName, webMark string) *createHandler {
 	return &createHandler{
 		Basic:           basic,
 		protoModuleName: protoModuleName,
+		webMark:         webMark,
 	}
 }
 
@@ -108,7 +110,7 @@ func (s *createHandler) controllers(parses []basic.Parse) (err error) {
 
 	controlGen.HasController = len(controlGen.Controllers) > 0
 
-	text, err := utils.CreateTmp(controlGen, handlerControllerGenTemp)
+	text, err := utils.CreateTmp(controlGen, s.getHandlerControllerGenTemp())
 	if err != nil {
 		return
 	}
@@ -126,7 +128,7 @@ func (s *createHandler) controllers(parses []basic.Parse) (err error) {
 		return
 	}
 
-	err = utils.RunCommand("", "gofmt", "-w", filename)
+	err = s.Gofmt(filename)
 	if err != nil {
 		return
 	}
@@ -138,7 +140,7 @@ func (s *createHandler) controllers(parses []basic.Parse) (err error) {
 		HandlerPkg:  s.Conf.Analyze.Handler[strings.LastIndex(s.Conf.Analyze.Handler, "/")+1:],
 	}
 
-	text, err = utils.CreateTmp(control, handlerControllerTemp)
+	text, err = utils.CreateTmp(control, s.getHandlerControllerTemp())
 	if err != nil {
 		return
 	}
@@ -149,7 +151,7 @@ func (s *createHandler) controllers(parses []basic.Parse) (err error) {
 		return
 	}
 
-	err = utils.RunCommand("", "gofmt", "-w", controlFileName)
+	err = s.Gofmt(controlFileName)
 	if err != nil {
 		return
 	}
@@ -210,7 +212,7 @@ func (s *createHandler) file(parses []basic.Parse) (err error) {
 		ParamsPath: s.Conf.Analyze.Sources,
 	}
 
-	text, err := utils.CreateTmp(fileTmp, handlerFileTemp)
+	text, err := utils.CreateTmp(fileTmp, s.getHandlerFileTemp())
 	if err != nil {
 		return
 	}
@@ -276,7 +278,7 @@ func (s *createHandler) file(parses []basic.Parse) (err error) {
 			}
 
 			var apd string
-			apd, err = utils.CreateTmp(apdTmp, handlerFuncTemp)
+			apd, err = utils.CreateTmp(apdTmp, s.getHandlerFuncTemp())
 			if err != nil {
 				return
 			}
@@ -286,7 +288,7 @@ func (s *createHandler) file(parses []basic.Parse) (err error) {
 				return
 			}
 
-			err = utils.RunCommand("", "gofmt", "-w", filename)
+			err = s.Gofmt(filename)
 			if err != nil {
 				return
 			}
@@ -294,4 +296,44 @@ func (s *createHandler) file(parses []basic.Parse) (err error) {
 	}
 
 	return
+}
+
+func (s *createHandler) getHandlerControllerGenTemp() string {
+	switch s.webMark {
+	case basic.Gin:
+		return ginHandlerControllerGenTemp
+	case basic.Fiber:
+		return handlerControllerGenTemp
+	}
+	return ""
+}
+
+func (s *createHandler) getHandlerControllerTemp() string {
+	switch s.webMark {
+	case basic.Gin:
+		return ginHandlerControllerTemp
+	case basic.Fiber:
+		return handlerControllerTemp
+	}
+	return ""
+}
+
+func (s *createHandler) getHandlerFuncTemp() string {
+	switch s.webMark {
+	case basic.Gin:
+		return ginHandlerFuncTemp
+	case basic.Fiber:
+		return handlerFuncTemp
+	}
+	return ""
+}
+
+func (s *createHandler) getHandlerFileTemp() string {
+	switch s.webMark {
+	case basic.Gin:
+		return ginHandlerFileTemp
+	case basic.Fiber:
+		return handlerFileTemp
+	}
+	return ""
 }
