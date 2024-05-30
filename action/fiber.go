@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/tdeken/grass/basic"
+	"github.com/tdeken/grass/createswagger"
 	"github.com/tdeken/grass/utils"
 	"gopkg.in/yaml.v3"
 	"os"
@@ -66,6 +67,11 @@ func (s *Fiber) Run() {
 	}
 
 	err = s.route()
+	if err != nil {
+		return
+	}
+
+	err = s.swagger()
 	if err != nil {
 		return
 	}
@@ -193,4 +199,11 @@ func (s *Fiber) service() (err error) {
 
 func (s *Fiber) handler() (err error) {
 	return newCreateHandler(s.Basic, s.moduleName, basic.Fiber).run()
+}
+
+func (s *Fiber) swagger() (err error) {
+	swagger := createswagger.New(s.Dir, s.moduleName)
+	swagger.Run()
+
+	return swagger.Error()
 }
