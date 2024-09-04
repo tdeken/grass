@@ -355,7 +355,7 @@ type GinServiceTemp struct {
 	Service string
 }
 
-const ginServiceTemp = `package service
+const ginServiceTemp = `package {{ .Pkg }}
 
 import (
 	"github.com/gin-gonic/gin"
