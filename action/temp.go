@@ -29,7 +29,6 @@ func (s *Service) Context() *fasthttp.RequestCtx {
 type HandlerTemp struct {
 	ModName string
 	Pkg     string
-	Handler string
 }
 
 const handlerTemp = `package {{ .Pkg }}
@@ -44,11 +43,11 @@ import (
 	action "github.com/tdeken/fiberaction"
 )
 
-type {{ .Handler }} struct {
+type Handler struct {
 }
 
 // ValidateRequest 统一校验请求数据
-func (s {{ .Handler }}) ValidateRequest(ctx *fiber.Ctx, rt validate.RequestInterface) *code.Error {
+func (s Handler) ValidateRequest(ctx *fiber.Ctx, rt validate.RequestInterface) *code.Error {
 	err := validate.CheckParams(ctx, rt)
 	if err != nil {
 		var errMsg string
@@ -68,7 +67,7 @@ func (s {{ .Handler }}) ValidateRequest(ctx *fiber.Ctx, rt validate.RequestInter
 }
 
 // ChooseMid 可以选择的服务中间件
-func (s {{ .Handler }}) ChooseMid(t action.MidType) (ms []fiber.Handler) {
+func (s Handler) ChooseMid(t action.MidType) (ms []fiber.Handler) {
 	if t == nil {
 		return
 	}
@@ -377,7 +376,6 @@ func (s *Service) Context() *gin.Context {
 type GinHandlerTemp struct {
 	ModName string
 	Pkg     string
-	Handler string
 }
 
 const ginHandlerTemp = `package {{ .Pkg }}
@@ -392,11 +390,11 @@ import (
 	action "github.com/tdeken/ginaction"
 )
 
-type {{ .Handler }} struct {
+type Handler struct {
 }
 
 // ValidateRequest 统一校验请求数据
-func (s {{ .Handler }}) ValidateRequest(ctx *gin.Context, rt validate.RequestInterface) *code.Error {
+func (s Handler) ValidateRequest(ctx *gin.Context, rt validate.RequestInterface) *code.Error {
 	err := validate.CheckParams(ctx, rt)
 	if err != nil {
 		var errMsg string
@@ -416,7 +414,7 @@ func (s {{ .Handler }}) ValidateRequest(ctx *gin.Context, rt validate.RequestInt
 }
 
 // ChooseMid 可以选择的服务中间件
-func (s {{ .Handler }}) ChooseMid(t action.MidType) (ms []gin.HandlerFunc) {
+func (s Handler) ChooseMid(t action.MidType) (ms []gin.HandlerFunc) {
 	if t == nil {
 		return
 	}
