@@ -157,10 +157,9 @@ func (s *Fiber) dir() (err error) {
 		return
 	}
 
-	serPkg, serStruct := utils.PkgAndStruct(s.Conf.Analyze.Service)
+	serPkg, _ := utils.PkgAndStruct(s.Conf.Analyze.Service)
 	ser, err := utils.CreateTmp(ServiceTemp{
-		Pkg:     serPkg,
-		Service: serStruct,
+		Pkg: serPkg,
 	}, serviceTemp)
 	if err != nil {
 		return

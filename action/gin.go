@@ -157,10 +157,9 @@ func (s *Gin) dir() (err error) {
 		return
 	}
 
-	serPkg, serStruct := utils.PkgAndStruct(s.Conf.Analyze.Service)
+	serPkg, _ := utils.PkgAndStruct(s.Conf.Analyze.Service)
 	ser, err := utils.CreateTmp(GinServiceTemp{
-		Pkg:     serPkg,
-		Service: serStruct,
+		Pkg: serPkg,
 	}, ginServiceTemp)
 	if err != nil {
 		return

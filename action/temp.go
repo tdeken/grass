@@ -14,15 +14,15 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
-type {{ .Service }} struct {
+type Service struct {
 	Ctx *fiber.Ctx
 }
 
-func (s *{{ .Service }}) Init(ctx *fiber.Ctx) {
+func (s *Service) Init(ctx *fiber.Ctx) {
 	s.Ctx = ctx
 }
 
-func (s *{{ .Service }}) Context() *fasthttp.RequestCtx {
+func (s *Service) Context() *fasthttp.RequestCtx {
 	return s.Ctx.Context()
 }`
 
@@ -93,6 +93,7 @@ type ServiceGroupTemp struct {
 	ModuleName  string
 	ServicePath string
 	ServicePkg  string
+	ServiceName string
 	Name        string
 	ParamsPath  string
 }
@@ -351,8 +352,7 @@ func Route() { {{ range $value := .Modules }}
 `
 
 type GinServiceTemp struct {
-	Pkg     string
-	Service string
+	Pkg string
 }
 
 const ginServiceTemp = `package {{ .Pkg }}
