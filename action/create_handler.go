@@ -167,6 +167,7 @@ func (s *createHandler) _group(parse basic.Parse) (text string, err error) {
 		Route:      utils.MidString(parse.Group.Name, '-'),
 		Actions:    nil,
 		ModuleName: s.protoModuleName,
+		DepCtx:     s.getCtxTemp(),
 	}
 
 	if parse.Group.As != "" {
@@ -335,6 +336,16 @@ func (s *createHandler) getHandlerFileTemp() string {
 		return ginHandlerFileTemp
 	case basic.Fiber:
 		return handlerFileTemp
+	}
+	return ""
+}
+
+func (s *createHandler) getCtxTemp() string {
+	switch s.webMark {
+	case basic.Gin:
+		return "ctx *gin.Context"
+	case basic.Fiber:
+		return "ctx *fiber.Ctx"
 	}
 	return ""
 }

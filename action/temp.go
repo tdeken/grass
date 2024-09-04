@@ -191,6 +191,7 @@ type HandlerGroupTemp struct {
 	Route      string
 	Actions    []template.HTML
 	ModuleName string
+	DepCtx     string
 }
 
 var handlerGroupTemp = `// {{ .Name }} {{ .Desc }}
@@ -211,7 +212,7 @@ func (s {{ .Name }}) Register() []action.Action {
 }
 
 // 获取依赖服务
-func (s {{ .Name }}) getDep(ctx *gin.Context) {{ .ModuleName }}.{{ .Name }} {
+func (s {{ .Name }}) getDep({{ .DepCtx }}) {{ .ModuleName }}.{{ .Name }} {
 	dep := {{ .ModuleName }}.{{ .Name }}{}
 	dep.Init(ctx)
 	return dep
