@@ -105,7 +105,7 @@ func (s *Gin) route() (err error) {
 
 		if exit {
 			er.Modules = append(er.Modules, v.Name())
-			er.Pkgs = append(er.Pkgs, fmt.Sprintf(s.Conf.ModName+"/"+pkg))
+			er.Pkgs = append(er.Pkgs, s.Conf.ModName+"/"+pkg)
 		}
 	}
 

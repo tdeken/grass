@@ -133,11 +133,13 @@ func (s *createHandler) controllers(parses []basic.Parse) (err error) {
 		return
 	}
 
+	hg := s.Conf.Analyze.Handler[strings.LastIndex(s.Conf.Analyze.Handler, "/")+1:]
 	var control = HandlerControllerTemp{
 		ModName:     s.Conf.ModName,
 		ModuleName:  s.protoModuleName,
 		HandlerPath: s.Conf.Analyze.Handler,
-		HandlerPkg:  s.Conf.Analyze.Handler[strings.LastIndex(s.Conf.Analyze.Handler, "/")+1:],
+		HandlerPkg:  hg,
+		HandlerName: strings.ToUpper(hg[:1]) + hg[1:],
 	}
 
 	text, err = utils.CreateTmp(control, s.getHandlerControllerTemp())

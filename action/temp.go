@@ -222,6 +222,7 @@ type HandlerControllerTemp struct {
 	ModuleName  string
 	HandlerPath string
 	HandlerPkg  string
+	HandlerName string
 }
 
 var handlerControllerTemp = `package {{ .ModuleName }}
@@ -233,7 +234,7 @@ import (
 )
 
 type Controller struct {
-	{{ .HandlerPkg }}.Handler
+	{{ .HandlerPkg }}.{{HandlerName}}
 }
 
 // ChooseMid 可以选择的服务中间件
