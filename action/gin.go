@@ -171,11 +171,10 @@ func (s *Gin) dir() (err error) {
 		return
 	}
 
-	hdlPkg, hdlStruct := utils.PkgAndStruct(s.Conf.Analyze.Handler)
+	hdlPkg, _ := utils.PkgAndStruct(s.Conf.Analyze.Handler)
 	hdl, err := utils.CreateTmp(GinHandlerTemp{
 		ModName: s.Conf.ModName,
 		Pkg:     hdlPkg,
-		Handler: hdlStruct,
 	}, ginHandlerTemp)
 	if err != nil {
 		return

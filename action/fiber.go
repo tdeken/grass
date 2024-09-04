@@ -171,11 +171,10 @@ func (s *Fiber) dir() (err error) {
 		return
 	}
 
-	hdlPkg, hdlStruct := utils.PkgAndStruct(s.Conf.Analyze.Handler)
+	hdlPkg, _ := utils.PkgAndStruct(s.Conf.Analyze.Handler)
 	hdl, err := utils.CreateTmp(HandlerTemp{
 		ModName: s.Conf.ModName,
 		Pkg:     hdlPkg,
-		Handler: hdlStruct,
 	}, handlerTemp)
 	if err != nil {
 		return
