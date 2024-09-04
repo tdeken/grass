@@ -139,7 +139,6 @@ func (s *createHandler) controllers(parses []basic.Parse) (err error) {
 		ModuleName:  s.protoModuleName,
 		HandlerPath: s.Conf.Analyze.Handler,
 		HandlerPkg:  hg,
-		HandlerName: strings.ToUpper(hg[:1]) + hg[1:],
 	}
 
 	text, err = utils.CreateTmp(control, s.getHandlerControllerTemp())
