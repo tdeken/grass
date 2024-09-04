@@ -96,14 +96,16 @@ func (s *Fiber) route() (err error) {
 			continue
 		}
 
-		var pkg = s.PrefixDir(fmt.Sprintf("%s/%s", s.Conf.Analyze.Handler, v.Name()))
+		var filePath = s.PrefixDir(fmt.Sprintf("%s/%s", s.Conf.Analyze.Handler, v.Name()))
 		var exit bool
-		exit, err = utils.IsFileExist(pkg + "/controller.gen.go")
+		exit, err = utils.IsFileExist(filePath + "/controller.gen.go")
 		if err != nil {
 			return
 		}
 
 		if exit {
+			pkg := fmt.Sprintf("%s/%s/%s", s.Conf.ModName, s.Conf.Analyze.Handler, v.Name())
+
 			er.Modules = append(er.Modules, v.Name())
 			er.Pkgs = append(er.Pkgs, pkg)
 		}

@@ -234,7 +234,7 @@ import (
 )
 
 type Controller struct {
-	{{ .HandlerPkg }}.{{HandlerName}}
+	{{ .HandlerPkg }}.{{ .HandlerName }}
 }
 
 // ChooseMid 可以选择的服务中间件
@@ -256,7 +256,7 @@ import (
 )
 
 type Controller struct {
-	{{ .HandlerPkg }}.Handler
+	{{ .HandlerPkg }}.{{ .HandlerName }}
 }
 
 // ChooseMid 可以选择的服务中间件
