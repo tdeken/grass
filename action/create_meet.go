@@ -13,12 +13,14 @@ import (
 type createMeet struct {
 	basic.Basic
 	protoModuleName string
+	webMark         string
 }
 
-func newCreateMeet(basic basic.Basic, protoModuleName string) *createMeet {
+func newCreateMeet(basic basic.Basic, protoModuleName, webMark string) *createMeet {
 	return &createMeet{
 		Basic:           basic,
 		protoModuleName: protoModuleName,
+		webMark:         webMark,
 	}
 }
 
@@ -36,10 +38,14 @@ func (s *createMeet) run() (err error) {
 
 	for _, parse := range parses {
 		var filename string
-		var meet = meetOne{MeetTemp: MeetTemp{
-			ModuleName: s.protoModuleName,
-			Messages:   nil,
-		}}
+		var meet = meetOne{
+			webMark:    s.webMark,
+			dictionary: make(map[string]string),
+			MeetTemp: MeetTemp{
+				ModuleName: s.protoModuleName,
+				Messages:   nil,
+			},
+		}
 		filename, err = meet.one(parse, s.PrefixDir(s.Conf.Analyze.Sources))
 		if err != nil {
 			return
@@ -55,6 +61,7 @@ func (s *createMeet) run() (err error) {
 }
 
 type meetOne struct {
+	webMark    string
 	dictionary map[string]string
 	MeetTemp
 }
@@ -159,7 +166,7 @@ func (b *meetOne) parseReq(req basic.Message, suffix, uriName, headerName, metho
 		}
 
 		var from = field.From
-		if strings.ToUpper(method) == "GET" && from == "" {
+		if strings.ToUpper(method) == "GET" && from == "" && b.webMark == basic.Fiber {
 			from = "query"
 		}
 
