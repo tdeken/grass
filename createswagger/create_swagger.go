@@ -402,7 +402,7 @@ func (s *CreateSwagger) generate() (err error) {
 		return
 	}
 
-	var content = fmt.Sprintf("//go:generate swag init  -o docs/%s -g doc.go -d %s/%s\n", s.moduleName, s.Conf.Swagger.Path, s.moduleName)
+	var content = fmt.Sprintf("//go:generate swag init  -o docs/%s -g doc.go -d %s/%s", s.moduleName, s.Conf.Swagger.Path, s.moduleName)
 	text := string(b)
 
 	if !strings.Contains(text, "//go:generate swag init") {
@@ -416,6 +416,6 @@ func (s *CreateSwagger) generate() (err error) {
 		return
 	}
 
-	_, err = file.WriteString(content)
+	_, err = file.WriteString(content + "\r\n")
 	return
 }
