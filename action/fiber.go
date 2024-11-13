@@ -190,7 +190,7 @@ func (s *Fiber) dir() (err error) {
 }
 
 func (s *Fiber) meet() (err error) {
-	return newCreateMeet(s.Basic, s.moduleName).run()
+	return newCreateMeet(s.Basic, s.moduleName, basic.Fiber).run()
 }
 
 func (s *Fiber) service() (err error) {

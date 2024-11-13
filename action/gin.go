@@ -190,7 +190,7 @@ func (s *Gin) dir() (err error) {
 }
 
 func (s *Gin) meet() (err error) {
-	return newCreateMeet(s.Basic, s.moduleName).run()
+	return newCreateMeet(s.Basic, s.moduleName, basic.Gin).run()
 }
 
 func (s *Gin) service() (err error) {
