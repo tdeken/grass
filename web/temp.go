@@ -370,7 +370,6 @@ RUN apk --no-cache add tzdata \
 ENV CGO_ENABLED=0
 ENV GO111MODULE=on
 ENV GOPROXY=https://mirrors.aliyun.com/goproxy/
-ENV GOPRIVATE=gits.branchcn.com/backend
 
 WORKDIR /{{ .ModName }}
 
