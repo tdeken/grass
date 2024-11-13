@@ -10,4 +10,4 @@
 
 ## CreateFiber
 
-    grass -fbinit mod_name -d [dir] (eg. grass -cp -fbinit demo)
+    grass -fbinit mod_name -d [dir] (eg. grass -fbinit demo)
