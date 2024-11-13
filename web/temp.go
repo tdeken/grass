@@ -508,9 +508,9 @@ const ginTemp = `package gin
 
 import (
 	"context"
-	"demo/internal/config"
-	"demo/internal/gin/route"
-	"demo/internal/gin/server"
+	"{{ .ModName }}/internal/config"
+	"{{ .ModName }}/internal/gin/route"
+	"{{ .ModName }}/internal/gin/server"
 	"fmt"
 	"net/http"
 	"time"
