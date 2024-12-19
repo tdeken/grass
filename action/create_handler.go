@@ -239,7 +239,7 @@ func (s *createHandler) file(parses []basic.Parse) (err error) {
 				return
 			}
 			var str = bytes.NewBuffer(b)
-			if strings.Contains(str.String(), fmt.Sprintf("%s(%s)", v1.Name, s.getCtxTemp())) {
+			if strings.Contains(str.String(), fmt.Sprintf("func (s %s) %s(%s)", v.Group.Name, v1.Name, s.getCtxTemp())) {
 				continue
 			}
 
