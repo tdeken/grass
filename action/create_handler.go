@@ -3,14 +3,15 @@ package action
 import (
 	"bytes"
 	"fmt"
-	"github.com/tdeken/grass/basic"
-	"github.com/tdeken/grass/utils"
-	"gopkg.in/yaml.v3"
 	"html/template"
 	"io"
 	"os"
 	"reflect"
 	"strings"
+
+	"github.com/tdeken/grass/basic"
+	"github.com/tdeken/grass/utils"
+	"gopkg.in/yaml.v3"
 )
 
 type createHandler struct {
@@ -345,7 +346,7 @@ func (s *createHandler) getCtxTemp() string {
 	case basic.Gin:
 		return "ctx *gin.Context"
 	case basic.Fiber:
-		return "ctx *fiber.Ctx"
+		return "ctx fiber.Ctx"
 	}
 	return ""
 }
