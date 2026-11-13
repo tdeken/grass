@@ -65,7 +65,7 @@ const routeTemp = `//DO NOT EDIT.
 
 package route
 
-func Route() { 
+func Route() {
 	// load handler controller
 }
 `
