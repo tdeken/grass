@@ -329,7 +329,7 @@ import ({{ range $value := .Pkgs }}
 	"{{ $value }}"{{ end }}
 )
 
-func Route() { {{ range $value := .Modules }}
+func Route() { {{- range $value := .Modules }}
 	{{ $value }}.Route(){{ end }}
 }
 `
