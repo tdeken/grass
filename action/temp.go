@@ -10,7 +10,7 @@ type ServiceTemp struct {
 const serviceTemp = `package {{ .Pkg }}
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"github.com/valyala/fasthttp"
 )
 
@@ -39,7 +39,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	action "github.com/tdeken/fiberaction"
 )
 
@@ -141,7 +141,7 @@ import (
 	"{{ .ModName }}/internal/fiber/server"
 	action "github.com/tdeken/fiberaction"
 	"{{ .ModName }}/{{ .ServicePath }}/{{ .ModuleName }}"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 // Route 模块路由
@@ -229,7 +229,7 @@ var handlerControllerTemp = `package {{ .ModuleName }}
 
 import (
 	"{{ .ModName }}/{{ .HandlerPath }}"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	action "github.com/tdeken/fiberaction"
 )
 
@@ -262,7 +262,7 @@ type HandlerFileTemp struct {
 var handlerFileTemp = `package {{ .ModuleName }}
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	meet "{{ .ModName }}/{{ .ParamsPath }}/{{ .ModuleName }}"
 	"{{ .ModName }}/internal/fiber/result"
 )

@@ -5,7 +5,7 @@ import "html/template"
 const fiberServerTemp = `package server
 
 import (
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 type WebServer struct {
@@ -27,7 +27,7 @@ const fiberValidateTemp = `package validate
 
 import (
 	"github.com/go-playground/validator/v10"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 	"strings"
 )
 
@@ -78,7 +78,7 @@ const fiberResultTemp = `package result
 
 import (
 	"{{ .ModName }}/internal/code"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
 )
 
 type WebResult struct {
