@@ -35,7 +35,7 @@ var validate = newValidate()
 
 type RequestInterface any
 
-func CheckParams(ctx *fiber.Ctx, rt RequestInterface) (err error) {
+func CheckParams(ctx fiber.Ctx, rt RequestInterface) (err error) {
 	switch strings.ToUpper(string(ctx.Request().Header.Method())) {
 	case fiber.MethodGet:
 		err = ctx.QueryParser(rt)
@@ -87,7 +87,7 @@ type WebResult struct {
 	Data any    ` + "`json:" + `"data"` + "`" + ` //返回的数据结果
 }
 
-func Json(ctx *fiber.Ctx, res any, err error) error {
+func Json(ctx fiber.Ctx, res any, err error) error {
 	var crr *code.Error
 	if err != nil {
 		var ok bool

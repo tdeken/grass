@@ -15,10 +15,10 @@ import (
 )
 
 type Service struct {
-	Ctx *fiber.Ctx
+	Ctx fiber.Ctx
 }
 
-func (s *Service) Init(ctx *fiber.Ctx) {
+func (s *Service) Init(ctx fiber.Ctx) {
 	s.Ctx = ctx
 }
 
@@ -47,7 +47,7 @@ type Handler struct {
 }
 
 // ValidateRequest 统一校验请求数据
-func (s Handler) ValidateRequest(ctx *fiber.Ctx, rt validate.RequestInterface) *code.Error {
+func (s Handler) ValidateRequest(ctx fiber.Ctx, rt validate.RequestInterface) *code.Error {
 	err := validate.CheckParams(ctx, rt)
 	if err != nil {
 		var errMsg string
@@ -289,7 +289,7 @@ type HandlerFuncTemp struct {
 var handlerFuncTemp = `
 // {{ .Name }} {{ .Desc }}
 // @Router {{ .Route }} [{{ .Method }}]
-func (s {{ .Group }}) {{ .Name }}(ctx *fiber.Ctx) (e error) {
+func (s {{ .Group }}) {{ .Name }}(ctx fiber.Ctx) (e error) {
 	var form = &meet.{{ .Req }}{}
 	if err := s.ValidateRequest(ctx, form); err != nil {
 		return result.Json(ctx, nil, err)
